@@ -260,14 +260,15 @@ prompt = f"Context: {context}\nUser: {user_query}\nAnswer:"
 # Задание 5. Реализация веб-сервиса через Streamlit
 
 ### Описание задачи
-Это **финальное** задание (не проверяется автоматически). Нужно сделать простое **веб-приложение** на базе Streamlit, чтобы пользователь мог:
-1.	Ввести вопрос.
-2.	Получить ответ, основанный на самых релевантных чанках.
+В этом финальном задании мы создадим простое веб-приложение, где пользователь сможет задавать вопросы о курсах Karpov.Courses и получать умные ответы. Будем использовать Streamlit - это библиотека Python, которая позволяет создавать веб-приложения без знания HTML/CSS/JavaScript.
+Благодаря приложению пользователь сможет:
+1.  Ввести вопрос.
+2.  Получить ответ, основанный на самых релевантных чанках.
 
 ### Что нужно сделать
 
 1. Подготовить свой проект под нужный формат
-Например:
+Например, можно использовать следующую структуру:
 ```python
 .
 ├── streamlit_app.py   # Streamlit-приложение
@@ -314,15 +315,21 @@ if __name__ == "__main__":
 streamlit run streamlit_app.py
 ```
 
-#### Деплой проекта:
-- Загрузите проект на GitHub
-- Зайдите на Streamlit Cloud и подключите репозиторий.
-- Укажите файл для запуска (streamlit_app.py).
-- Добавьте секреты через вкладку Secrets (например, ключ OpenAI).
+####  Деплой (по желанию)
+Если хотите сделать ваше приложение доступным онлайн:
 
-#### Полезные ссылки
-- [Streamlit docs](https://docs.streamlit.io/)
-- [Streamlit Cloud docs](https://docs.streamlit.io/streamlit-cloud)
+1. Создайте аккаунт на [Streamlit Cloud](https://streamlit.io/cloud)
+2. Загрузите код на GitHub
+3. На Streamlit Cloud:
+   - Подключите ваш GitHub репозиторий
+   - Укажите файл `streamlit_app.py`
+   - Добавьте секреты (например, OPENAI_API_KEY) через настройки
+
+### Полезные ссылки
+- [Streamlit Cheat Sheet](https://docs.streamlit.io/library/cheatsheet) - шпаргалка по командам
+- [Streamlit Components](https://docs.streamlit.io/library/api-reference) - все доступные виджеты
+- [Streamlit Session State](https://docs.streamlit.io/library/api-reference/session-state) - как хранить данные между обновлениями
+- [Streamlit Caching](https://docs.streamlit.io/library/advanced-features/caching) - как оптимизировать производительность
 
 #### Подсказка #1
 Храните промежуточные результаты (например, тексты, эмбеддинги) в `st.session_state`, чтобы не пересоздавать всё при каждом нажатии кнопки.
