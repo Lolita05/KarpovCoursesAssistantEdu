@@ -1,17 +1,13 @@
 import openai
 
-def create_embeddings(chunks: list, model_name: str = "text-embedding-ada-002") -> list:
+def create_embeddings(chunks, model_name="text-embedding-ada-002"):
     """
-    Генерирует эмбеддинги (векторы) для списка чанков, используя OpenAI API.
-
-    :param chunks: Список строк (чанков).
-    :param model_name: Название модели эмбеддингов OpenAI (по умолчанию text-embedding-ada-002).
-    :return: Список кортежей (chunk_text, embedding_vector).
+    Создает эмбеддинги для каждого чанка текста.
     """
-    results = []
+    client = openai.OpenAI()  # Создаем клиент здесь
+    result = []
     for ch in chunks:
-        response = openai.embeddings.create(input=ch,
-        model=model_name)
-        emb = response.data[0].embedding
-        results.append((ch, emb))
-    return results
+        response = client.embeddings.create(input=ch,
+                                          model=model_name)
+        result.append((ch, response.data[0].embedding))
+    return result

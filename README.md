@@ -83,7 +83,7 @@ def parse_karpov_landing(url: str) -> str:
 Если код сваливается с ошибкой, за все остальные проверки зачисляются 0 баллов.  
 
 #### Подсказка #1
-Для упрощения можно обойтись связкой requests + BeautifulSoup, так как лендинг не динамический.
+Для упрощения можно обойтись связкой requests + BeautifulSoup.
 ```python
 import requests
 from bs4 import BeautifulSoup
@@ -94,7 +94,9 @@ from bs4 import BeautifulSoup
 Используйте сепаратор пробел `(separator=" ")`
 
 #### Подсказка #3
-Можно усложнить код и добавить связку undetected-chromedriver + Selenium. Оно учтет вариант, если сайт динамический (в т.ч. React/JS-фреймворки) и важный контент подгружается после рендеринга
+pytest==8.3.4
+pytest==8.3.4
+Можно усложнить код и добавить связку undetected-chromedriver + Selenium. Оно учтет вариант, если сайт динамический (в т.ч. React/JS-фреймворки) и важный контент подгружается после рендеринга. Однако если работаете на python3.12, проблема в том, что в Python 3.12 модуль distutils был удален, а он нужен для undetected-chromedriver. Поэтому можно использовать setuptools или попробовать альтернативный вариант с использованием selenium-stealth вместо undetected-chromedriver.
 
 ```python
 import time

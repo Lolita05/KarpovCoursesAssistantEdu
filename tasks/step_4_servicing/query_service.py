@@ -9,9 +9,9 @@ def cosine_similarity(vec_a, vec_b):
     b = np.array(vec_b)
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
-def find_top_k(query: str, embeddings_list: list, k: int = 3, model_name: str = "text-embedding-ada-002"):
+def find_top_k(query: str, embeddings_list: list, k: int = 5, model_name: str = "text-embedding-ada-002"):
     """
-    Находит топ-k релевантных чанков для заданного пользовательского запроса.
+    Находит top-k наиболее похожих чанков для заданного запроса.
 
     :param query: Вопрос пользователя (строка).
     :param embeddings_list: Список (chunk_text, chunk_vector).
@@ -19,15 +19,15 @@ def find_top_k(query: str, embeddings_list: list, k: int = 3, model_name: str = 
     :param model_name: Модель эмбеддингов для генерации вектора запроса.
     :return: Список (chunk_text, score).
     """
-    # Эмбеддинг запроса
-    response = openai.embeddings.create(input=query,
-    model=model_name)
-    query_vec = response.data[0].embedding
+    client = openai.OpenAI()  # Создаем клиент здесь
+    response = client.embeddings.create(input=query,
+                                      model=model_name)
+    query_embedding = response.data[0].embedding
 
     # Подсчёт сходства
     scored_chunks = []
     for chunk_text, chunk_vec in embeddings_list:
-        score = cosine_similarity(query_vec, chunk_vec)
+        score = cosine_similarity(query_embedding, chunk_vec)
         scored_chunks.append((chunk_text, score))
 
     # Сортируем по убыванию сходства

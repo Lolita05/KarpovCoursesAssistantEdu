@@ -153,14 +153,18 @@ def colored_label_text_input(label: str, default_value: str = "", color: str = "
         f"<p style='margin-bottom:1px; font-size:16px; color:{color};'>{label}</p>",
         unsafe_allow_html=True
     )
-    return st.text_input("", value=default_value, label_visibility="hidden")
+    # Изменяем пустой label на сам label, но скрываем его
+    return st.text_input(
+        label,  # Используем тот же label вместо пустой строки
+        value=default_value,
+        label_visibility="hidden"  # Скрываем label, так как он отображается через markdown
+    )
 
 def main():
     st.title("KarpovCourses Assistant RAG Demo")
 
     # Боковое меню с настройками
     st.sidebar.title("Настройки")
-    headless = st.sidebar.checkbox("Безголовый режим (headless)?", value=True)
     chunk_size = st.sidebar.number_input("Размер чанка (символов)", value=800, step=100)
     k_top = st.sidebar.number_input("Сколько чанков искать?", value=3, step=1)
     model_name = st.sidebar.text_input("Модель Embeddings", value="text-embedding-ada-002")
@@ -173,7 +177,7 @@ def main():
 
     if st.button("Собрать данные"):
         with st.spinner("Парсим страницу..."):
-            text_data = parse_karpov_landing(url_input, headless=headless)
+            text_data = parse_karpov_landing(url_input)
         st.success("Парсинг завершён!")
         st.markdown(
             f'<span class="colored-text">Длина текста: {len(text_data)} символов</span>',

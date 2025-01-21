@@ -3,75 +3,34 @@
 import numpy as np
 import pytest
 from tasks.step_4_servicing.query_service import cosine_similarity, find_top_k
+from unittest.mock import Mock, patch
 
-# ТЕСТЫ ДЛЯ cosine_similarity
+# Патчим OpenAI клиент до импорта модуля
+mock_response = Mock()
+mock_response.data = [{"embedding": [1, 2, 3]}]
 
-def test_cosine_similarity_basic():
-    # Два идентичных вектора должны иметь сходство 1.
-    vec = [1, 2, 3]
-    score = cosine_similarity(vec, vec)
-    assert np.isclose(score, 1.0), f"Ожидается сходство 1, получено {score}"
-
-def test_cosine_similarity_orthogonal():
-    # Если два вектора ортогональны, то сходство должно быть 0.
-    vec_a = [1, 0, 0]
-    vec_b = [0, 1, 0]
-    score = cosine_similarity(vec_a, vec_b)
-    assert np.isclose(score, 0.0), f"Ожидается сходство 0, получено {score}"
-
-def test_cosine_similarity_known_result():
-    # Проверим на конкретном примере
-    vec_a = [1, 2, 3]
-    vec_b = [4, 5, 6]
-    # Вычисляем вручную:
-    # dot = 1*4 + 2*5 + 3*6 = 4+10+18 = 32
-    # norm(a) = sqrt(1+4+9)= sqrt(14)
-    # norm(b) = sqrt(16+25+36)= sqrt(77)
-    # Ожидаемое сходство = 32/(sqrt(14)*sqrt(77))
-    expected = 32 / (np.sqrt(14) * np.sqrt(77))
-    score = cosine_similarity(vec_a, vec_b)
-    assert np.isclose(score, expected), f"Ожидается {expected}, получено {score}"
-
-# ТЕСТЫ ДЛЯ find_top_k
-
-# Фиктивный объект ответа, имитирующий результат openai.embeddings.create
-class FakeResponseData:
-    def __init__(self, embedding):
-        self.embedding = embedding
-
-class FakeResponse:
-    def __init__(self, embedding):
-        self.data = [FakeResponseData(embedding)]
-
-def fake_openai_embeddings_create(input, model):
-    """
-    Фиктивная функция для имитации вызова openai.embeddings.create.
-    Независимо от входного запроса она всегда возвращает фиксированный эмбеддинг.
-    Для теста примем, что размерность эмбеддинга равна 3, и используем вектор [1, 2, 3].
-    """
-    return FakeResponse([1, 2, 3])
-
-def fake_cosine_similarity(vec_a, vec_b):
-    """
-    Оригинальная функция cosine_similarity.
-    """
-    a = np.array(vec_a)
-    b = np.array(vec_b)
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
-
-def test_find_top_k_real_similarity(monkeypatch):
+@patch("openai.OpenAI")
+def test_find_top_k_real_similarity(mock_openai_class):
     """
     Тест проверяет, что функция find_top_k возвращает топ-k чанков, которые имеют наибольшее сходство
-    с фиктивным эмбеддингом запроса. В данном тесте мы замокаем openai.embeddings.create, чтобы вместо
-    реального API возвращался фиксированный вектор [1,2,3].
+    с фиктивным эмбеддингом запроса.
     """
-    # Замокаем вызов openai.embeddings.create в модуле query_service, чтобы не происходил реальный запрос.
-    monkeypatch.setattr("tasks.step_4_servicing.query_service.openai.embeddings.create", fake_openai_embeddings_create)
-
+    # Создаем мок для ответа с правильной структурой
+    mock_embedding = Mock()
+    mock_embedding.embedding = [1, 2, 3]
+    
+    mock_response = Mock()
+    mock_response.data = [mock_embedding]
+    
+    # Настраиваем мок для клиента
+    mock_client = Mock()
+    mock_client.embeddings.create.return_value = mock_response
+    mock_openai_class.return_value = mock_client
+    
+    # Импортируем функцию после настройки мока
+    from tasks.step_4_servicing.query_service import find_top_k
+    
     # Фиктивные данные: создадим три чанка с эмбеддингами, размерностью 3.
-    # Для простоты зададим, что первый чанк имеет вектор [1, 2, 3] (тот же, что и фиктивный запрос),
-    # второй чанк – [0.9, 1.8, 2.7] (должен давать высокое сходство, т.к. пропорционален первому),
-    # третий чанк – [100, 100, 100] (совершенно не похож).
     embeddings_list = [
         ("курс Аналитик Данных", [1, 2, 3]),
         ("курс HardML", [0.9, 1.8, 2.7]),
@@ -112,3 +71,31 @@ def test_find_top_k_real_similarity(monkeypatch):
     # Также можно проверить, что 'Guitar lessons for beginners' не входит в топ-2.
     top_texts = [text for text, score in result]
     assert "Guitar lessons for beginners" not in top_texts, "Неподходящий чанк не должен входить в топ-k."
+
+# ТЕСТЫ ДЛЯ cosine_similarity
+
+def test_cosine_similarity_basic():
+    # Два идентичных вектора должны иметь сходство 1.
+    vec = [1, 2, 3]
+    score = cosine_similarity(vec, vec)
+    assert np.isclose(score, 1.0), f"Ожидается сходство 1, получено {score}"
+
+def test_cosine_similarity_orthogonal():
+    # Если два вектора ортогональны, то сходство должно быть 0.
+    vec_a = [1, 0, 0]
+    vec_b = [0, 1, 0]
+    score = cosine_similarity(vec_a, vec_b)
+    assert np.isclose(score, 0.0), f"Ожидается сходство 0, получено {score}"
+
+def test_cosine_similarity_known_result():
+    # Проверим на конкретном примере
+    vec_a = [1, 2, 3]
+    vec_b = [4, 5, 6]
+    # Вычисляем вручную:
+    # dot = 1*4 + 2*5 + 3*6 = 4+10+18 = 32
+    # norm(a) = sqrt(1+4+9)= sqrt(14)
+    # norm(b) = sqrt(16+25+36)= sqrt(77)
+    # Ожидаемое сходство = 32/(sqrt(14)*sqrt(77))
+    expected = 32 / (np.sqrt(14) * np.sqrt(77))
+    score = cosine_similarity(vec_a, vec_b)
+    assert np.isclose(score, expected), f"Ожидается {expected}, получено {score}"
