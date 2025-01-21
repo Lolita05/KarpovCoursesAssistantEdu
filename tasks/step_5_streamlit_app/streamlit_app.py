@@ -2,6 +2,14 @@ import streamlit as st
 import openai
 import os
 from dotenv import load_dotenv
+import sys
+
+# Определяем абсолютный путь к корневой папке проекта
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
+# Добавляем корневую папку в sys.path, если её там ещё нет
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 from tasks.step_1_parsing.parse_data import parse_karpov_landing
 from tasks.step_2_chunking.chunk_data import chunk_text
