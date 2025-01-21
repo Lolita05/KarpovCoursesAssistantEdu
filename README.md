@@ -90,13 +90,9 @@ from bs4 import BeautifulSoup
 
 # Инициализация response и beautifulsoup
 ```
-#### Подсказка #2
-Используйте сепаратор пробел `(separator=" ")`
 
-#### Подсказка #3
-pytest==8.3.4
-pytest==8.3.4
-Можно усложнить код и добавить связку undetected-chromedriver + Selenium. Оно учтет вариант, если сайт динамический (в т.ч. React/JS-фреймворки) и важный контент подгружается после рендеринга. Однако если работаете на python3.12, проблема в том, что в Python 3.12 модуль distutils был удален, а он нужен для undetected-chromedriver. Поэтому можно использовать setuptools или попробовать альтернативный вариант с использованием selenium-stealth вместо undetected-chromedriver.
+#### Подсказка #2
+Можно усложнить код и добавить связку `undetected-chromedriver` + `Selenium`. Оно учтет вариант, если сайт динамический (в т.ч. React/JS-фреймворки) и важный контент подгружается после рендеринга. Однако если работаете на python3.12, то можете поймать ошибку. Дело в том, чтомодуль `distutils` был удален, а он необходим для `undetected-chromedriver`. Поэтому можно также использовать `setuptools` или попробовать альтернативный вариант с использованием `selenium-stealth` вместо `undetected-chromedriver`.
 
 ```python
 import time
@@ -158,7 +154,7 @@ def create_embeddings(chunks: list, model_name: str = "text-embedding-ada-002") 
 	return results
 ```
 - Функция, принимающая список чанков (строк).
-- Возвращающая список кортежей (chunk_text, embedding_vector).
+- Возвращающая список кортежей (`chunk_text`, `embedding_vector`).
 2.	(Опционально) Сохранить полученные эмбеддинги в локальный файл (pickle/JSON), чтобы не перегенерировать их на каждом запуске.
 
 #### Полезные ссылки
@@ -195,7 +191,7 @@ def create_embeddings(chunks: list, model_name: str = "text-embedding-ada-002") 
 
 ### Что нужно сделать
 
-1. Создать find_top_k.py, где:
+1. Создать `find_top_k.py`, где:
 ```python
 def find_top_k(user_query: str, embeddings_list: list, k=3, model_name: str = "text-embedding-ada-002"):
     """
