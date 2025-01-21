@@ -1,0 +1,7 @@
+bs4==0.0.2
+undetected-chromedriver==3.5.5
+openai==1.59.9
+selenium==4.27.1
+streamlit==1.41.1
+python-dotenv==1.0.1
+pytest==8.3.4
